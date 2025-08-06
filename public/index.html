@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Server is Running</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: #000000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      .emoji {
+        font-size: 3rem;
+        animation: float 2s infinite ease-in-out;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      h2 {
+        margin-top: 10px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="emoji">🚀</div>
+    <h2>Server is Running...</h2>
+  </body>
+</html>
