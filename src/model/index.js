@@ -21,19 +21,19 @@ async function intialModels() {
   console.log("✅ Databases connected!!");
   // initial models
   // main DB
-  db.user = await createUserModel(userDB);
-  db.transaction = await transactionModel(userDB);
-  db.walletTracker = await walletTrackerModel(userDB);
-  db.tokenFavorite = await tokenFavoriteModel(userDB);
-  db.feeCollection = await feeCollectionModel(userDB);
-  db.claimSolana = await claimSolanaModel(userDB);
-  db.fifoHoldings = await fifoHoldingsModel(userDB);
-  db.addressAiSignle = await addressAiSignleModel(userDB);
-  db.aiSignalTokenAllLiveData = await aiSignalTokenAllLiveData(userDB);
-  db.withrawUsermodel = await withrawUsermodel(userDB);
-  db.holdingsHistory = await holdingsHistoryModel(userDB);
-  db.realizedPnlHistory = await realizedPnlHistoryModel(userDB);
-  db.adminUser = await adminUserModel(userDB);
+  db.User = await createUserModel(userDB);
+  // db.transaction = await transactionModel(userDB);
+  // db.walletTracker = await walletTrackerModel(userDB);
+  // db.tokenFavorite = await tokenFavoriteModel(userDB);
+  // db.feeCollection = await feeCollectionModel(userDB);
+  // db.claimSolana = await claimSolanaModel(userDB);
+  // db.fifoHoldings = await fifoHoldingsModel(userDB);
+  // db.addressAiSignle = await addressAiSignleModel(userDB);
+  // db.aiSignalTokenAllLiveData = await aiSignalTokenAllLiveData(userDB);
+  // db.withrawUsermodel = await withrawUsermodel(userDB);
+  // db.holdingsHistory = await holdingsHistoryModel(userDB);
+  // db.realizedPnlHistory = await realizedPnlHistoryModel(userDB);
+  // db.adminUser = await adminUserModel(userDB);
   console.log("✅ All models intialized!!");
 }
 

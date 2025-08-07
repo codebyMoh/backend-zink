@@ -46,9 +46,9 @@ exports.getGoogleAuthorizeUrl = (req) => {
 exports.getSession = async (req) => {
   const cookieHeader = req.headers.cookie;
   // console.log("🍪 Incoming cookies:", cookieHeader);
-
+  
   if (!cookieHeader) {
-    throw { status: 401, message: "Not authenticated" };
+    throw { status: 401, message: "Not authenticated 1" };
   }
 
   const cookies = {};
@@ -75,7 +75,7 @@ exports.getSession = async (req) => {
   });
 
   if (!cookies[COOKIE_NAME] || !cookies[COOKIE_NAME].value) {
-    throw { status: 401, message: "Not authenticated" };
+    throw { status: 401, message: "Not authenticated 2" };
   }
 
   const token = cookies[COOKIE_NAME].value;
@@ -85,6 +85,7 @@ exports.getSession = async (req) => {
       token,
       new TextEncoder().encode(JWT_SECRET)
     );
+    console.log("verified", verified)
 
     let cookieExpiration = null;
 

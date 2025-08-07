@@ -25,7 +25,6 @@ const allowedOrigins = [
   "http://localhost:7777",
 ];
 
-
 app.set("trust proxy", 1);
 const limiter = rateLimit({
   windowMs: 1000, // 1 second
@@ -129,7 +128,7 @@ app.use("/api/auth", authRoutes);
 intialModels()
   .then(async (res) => {
     server.listen(PORT, async () => {
-      callAllAdminFunction();
+      // callAllAdminFunction();
       console.log(`Server is running on port: ${PORT}`);
     });
   })
