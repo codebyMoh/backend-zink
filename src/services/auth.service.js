@@ -2,7 +2,7 @@ const { GOOGLE_CLIENT_ID, BK_URL, WEB_URL, APP_SCHEME, GOOGLE_AUTH_URL } = requi
 const jose = require("jose");
 const { COOKIE_NAME, JWT_SECRET } = require("../utils/constants");
 
-exports.getGoogleAuthorizeUrl = (req) => {
+const getGoogleAuthorizeUrl = (req) => {
   return new Promise((resolve, reject) => {
     if (!GOOGLE_CLIENT_ID) {
       return reject({ status: 500, message: 'Missing GOOGLE_CLIENT_ID environment variable' });
@@ -43,7 +43,7 @@ exports.getGoogleAuthorizeUrl = (req) => {
   });
 };
 
-exports.getSession = async (req) => {
+const getSession = async (req) => {
   const cookieHeader = req.headers.cookie;
   // console.log("🍪 Incoming cookies:", cookieHeader);
   
@@ -105,3 +105,8 @@ exports.getSession = async (req) => {
     throw { status: 401, message: "Invalid token" };
   }
 };
+
+module.exports = {
+  getGoogleAuthorizeUrl,
+  getSession
+}
