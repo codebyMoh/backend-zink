@@ -1,0 +1,40 @@
+import mongoose, { Model, Schema } from 'mongoose';
+import type { ITransaction } from '../constants/interfaces/model.interfaces.js';
+
+const transactionSchema = new Schema<ITransaction>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      default: null,
+      index: true,
+      required: true,
+    },
+    recipientId: {
+      type: Schema.Types.ObjectId,
+      default: null,
+      index: true,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    tx: { type: String, required: true },
+    recipientAddress: {
+      type: String,
+      required: true,
+    },
+    currency: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
+
+const Transaction: Model<ITransaction> = mongoose.model<ITransaction>(
+  'Transaction',
+  transactionSchema,
+);
+
+export default Transaction;
