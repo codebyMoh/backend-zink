@@ -139,3 +139,21 @@ export async function findUserBasedOnUsername(
     user: findUser,
   });
 }
+
+//scan user based on id
+export async function scanUserBasedOnUsername(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const { id } = req.validatedParams;
+  const findUser = await User.findById(id).select(
+    'name email userName walletAddressEVM userIdAlchemy',
+  );
+  if (!findUser) {
+    return ThrowError(code.UNAUTHORIZED, 'User not found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'User found.', {
+    user: findUser,
+  });
+}

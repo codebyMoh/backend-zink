@@ -26,3 +26,6 @@ export const addReferralSchema = zod.object({
 export const findUserUsingUsernameSchema = zod.object({
   userName: zod.string().min(8, 'Invalid username.'),
 });
+export const scanUserUsingIdSchema = zod.object({
+  id: zod.string().min(8, 'Invalid user.'),
+});
