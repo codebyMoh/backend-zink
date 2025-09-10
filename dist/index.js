@@ -12,7 +12,6 @@ const app = express();
 // strict origin cors configuration
 const getOrigins = process.env.ALLOWEDORIGIN;
 const allowedOrigins = getOrigins?.toString().split(',');
-console.log('🚀 ~ allowedOrigins:', allowedOrigins);
 const deploy = process.env.DEPLOY;
 // apis cors configuration
 app.use(cors({
