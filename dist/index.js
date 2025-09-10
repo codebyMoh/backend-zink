@@ -10,32 +10,38 @@ import transactionRoutes from './routes/transaction.routes.js';
 import { connectDB } from './config/DB/db.config.js';
 const app = express();
 // strict origin cors configuration
-const allowedOrigins = ['http://localhost:3000'];
+const getOrigins = process.env.ALLOWEDORIGIN;
+const allowedOrigins = getOrigins?.toString().split(',');
+console.log('🚀 ~ allowedOrigins:', allowedOrigins);
+const deploy = process.env.DEPLOY;
 // apis cors configuration
-// app.use(
-//   cors({
-//     origin: function (origin, callback) {
-//       if (!origin) {
-//         return callback(new Error('Unauthorized'));
-//         // return callback(null, true);
-//       }
-//       if (allowedOrigins.includes(origin)) {
-//         return callback(null, true);
-//       }
-//       return callback(new Error('Unauthorized'));
-//     },
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     allowedHeaders: [
-//       'Content-Type',
-//       'Authorization',
-//       'X-Requested-With',
-//       'X-API-Key',
-//     ],
-//     credentials: true,
-//     exposedHeaders: ['set-cookie'],
-//   }),
-// );
-app.use(cors()); // TODO:; remove this, open for all origins
+app.use(cors({
+    origin: function (origin, callback) {
+        if (deploy == 'development') {
+            // In development, allow all origins
+            return callback(null, true);
+        }
+        else if (deploy == 'production') {
+            // In production, only allow specific origins
+            if (!origin || !allowedOrigins.includes(origin)) {
+                return callback(new Error('Unauthorized'));
+            }
+        }
+        else {
+            // Default behavior if deploy is not set or unknown
+            return callback(new Error('Unauthorized'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'X-API-Key',
+    ],
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
+}));
 // send error when client is not authorized
 app.use((err, req, res, next) => {
     if (err?.message === 'Unauthorized') {
