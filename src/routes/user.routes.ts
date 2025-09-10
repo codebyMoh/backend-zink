@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { addReferral, findUserBasedOnUsername, register, scanUserBasedOnUsername } from '../controllers/user.controller.js';
+import { addReferral, findUserBasedOnUsername, register, scanUserBasedOnID } from '../controllers/user.controller.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
@@ -31,14 +31,14 @@ router.get(
   '/scanUser/:id',
   asyncHandler(authUser),
   asyncHandler(validateParams(scanUserUsingIdSchema)),
-  asyncHandler(findUserBasedOnUsername),
+  asyncHandler(scanUserBasedOnID),
 );
 // find user based on userName
 router.get(
   '/findUser/:userName',
   asyncHandler(authUser),
   asyncHandler(validateParams(findUserUsingUsernameSchema)),
-  asyncHandler(scanUserBasedOnUsername  ),
+  asyncHandler(findUserBasedOnUsername  ),
 );
 
 export default router;

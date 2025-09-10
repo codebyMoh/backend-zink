@@ -15,29 +15,30 @@ const app = express();
 const allowedOrigins = ['http://localhost:3000'];
 
 // apis cors configuration
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) {
-        return callback(new Error('Unauthorized'));
-        // return callback(null, true);
-      }
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error('Unauthorized'));
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'X-API-Key',
-    ],
-    credentials: true,
-    exposedHeaders: ['set-cookie'],
-  }),
-);
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin) {
+//         return callback(new Error('Unauthorized'));
+//         // return callback(null, true);
+//       }
+//       if (allowedOrigins.includes(origin)) {
+//         return callback(null, true);
+//       }
+//       return callback(new Error('Unauthorized'));
+//     },
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: [
+//       'Content-Type',
+//       'Authorization',
+//       'X-Requested-With',
+//       'X-API-Key',
+//     ],
+//     credentials: true,
+//     exposedHeaders: ['set-cookie'],
+//   }),
+// );
+app.use(cors()); // TODO:; remove this, open for all origins
 // send error when client is not authorized
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err?.message === 'Unauthorized') {
@@ -70,6 +71,11 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // defined entry routes
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`🔥 API Hit: [${req.method}] ${req.originalUrl}`);
+  next();
+});
+
 // user
 app.use('/api/v1/user', userRoutes);
 // transaction
