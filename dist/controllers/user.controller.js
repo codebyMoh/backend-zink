@@ -4,11 +4,27 @@ import { code } from '../constants/code.js';
 import { apiResponse } from '../utils/apiResponse.js';
 // register
 export async function register(req, res, next) {
-    const { email, addressEvm, addressSolana, userId, orgId } = req.body;
+    const { email, addressEvm, addressSolana, smartWalletAddress, userId, orgId } = req.body;
+    console.log(email, addressEvm, addressSolana, userId, orgId, "--------------------------");
     // check user is exist or not.
     const isUserExist = await User.findOne({ email: email });
     if (isUserExist) {
-        return ThrowError(code.BAD_REQUEST, 'User already exist.');
+        const token = await isUserExist?.generateJWTToken('30d');
+        if (!token) {
+            return ThrowError(code.INTERNAL_SERVER_ERROR, 'Internal server error (Token generation).');
+        }
+        return apiResponse(res, code.SUCCESS, 'User login successfull.', {
+            user: {
+                _id: isUserExist?._id,
+                email: isUserExist?.email,
+                userName: isUserExist?.userName,
+                addressSolana: isUserExist?.walletAddressSolana,
+                addressEVM: isUserExist?.walletAddressEVM,
+                smartWalletAddress: isUserExist?.smartWalletAddress,
+                active: isUserExist?.active,
+            },
+            token,
+        });
     }
     // generate referralId
     const referralId = `${addressEvm?.slice(0, 6) + addressSolana?.slice(-6)}`;
@@ -29,6 +45,7 @@ export async function register(req, res, next) {
         email: email,
         walletAddressEVM: addressEvm,
         walletAddressSolana: addressSolana,
+        smartWalletAddress: smartWalletAddress,
         userIdAlchemy: userId,
         orgIdAlchemy: orgId,
         referralId: referralId,
@@ -50,6 +67,7 @@ export async function register(req, res, next) {
             userName: user?.userName,
             addressSolana: user?.walletAddressSolana,
             addressEVM: user?.walletAddressEVM,
+            smartWalletAddress: user?.smartWalletAddress,
             active: user?.active,
         },
         token,
@@ -98,6 +116,18 @@ export async function addReferral(req, res, next) {
 export async function findUserBasedOnUsername(req, res, next) {
     const { userName } = req.validatedParams;
     const findUser = await User.findOne({ userName }).select('name email userName walletAddressEVM userIdAlchemy');
+    if (!findUser) {
+        return ThrowError(code.UNAUTHORIZED, 'User not found.');
+    }
+    return apiResponse(res, code.SUCCESS, 'User found.', {
+        user: findUser,
+    });
+}
+//scan user based on id
+export async function scanUserBasedOnID(req, res, next) {
+    const { id } = req.validatedParams;
+    console.log(id, "------------------");
+    const findUser = await User.findById(id).select('name email userName walletAddressEVM userIdAlchemy smartWalletAddress');
     if (!findUser) {
         return ThrowError(code.UNAUTHORIZED, 'User not found.');
     }

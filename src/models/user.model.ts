@@ -12,6 +12,7 @@ const userSchema = new Schema<IUser>(
     userName: { type: String, required: true, unique: true, index: true },
     walletAddressEVM: { type: String, unique: true },
     walletAddressSolana: { type: String, unique: true },
+    smartWalletAddress: { type: String, unique: true },
     userIdAlchemy: { type: String },
     orgIdAlchemy: { type: String },
     referralId: { type: String, default: null, index: true, unique: true },

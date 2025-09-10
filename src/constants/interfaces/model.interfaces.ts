@@ -8,6 +8,7 @@ export interface IUser extends Document {
   userName: string;
   walletAddressEVM?: string;
   walletAddressSolana?: string;
+  smartWalletAddress?: string;
   orgIdAlchemy: String;
   userIdAlchemy: String;
   referralId?: string | null;
