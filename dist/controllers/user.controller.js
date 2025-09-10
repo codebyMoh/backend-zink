@@ -4,7 +4,7 @@ import { code } from '../constants/code.js';
 import { apiResponse } from '../utils/apiResponse.js';
 // register
 export async function register(req, res, next) {
-    const { email, addressEvm, addressSolana, smartWalletAddress, userId, orgId } = req.body;
+    const { email, addressEvm, addressSolana, smartWalletAddress, userId, orgId, } = req.body;
     // check user is exist or not.
     const isUserExist = await User.findOne({ email: email });
     if (isUserExist) {
@@ -59,7 +59,7 @@ export async function register(req, res, next) {
     if (!token) {
         return ThrowError(code.INTERNAL_SERVER_ERROR, 'Internal server error (Token generation).');
     }
-    return apiResponse(res, code.SUCCESS, 'User login successfully.', {
+    return apiResponse(res, code.SUCCESS, 'User register successfully.', {
         user: {
             _id: user?._id,
             email: user?.email,
@@ -128,6 +128,9 @@ export async function scanUserBasedOnID(req, res, next) {
     const findUser = await User.findById(id).select('name email userName walletAddressEVM userIdAlchemy smartWalletAddress');
     if (!findUser) {
         return ThrowError(code.UNAUTHORIZED, 'User not found.');
+    }
+    if (findUser?._id?.toString() == id) {
+        return ThrowError(code.NOT_ALLOWED, 'This is your own qr code.');
     }
     return apiResponse(res, code.SUCCESS, 'User found.', {
         user: findUser,

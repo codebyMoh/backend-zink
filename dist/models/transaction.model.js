@@ -6,6 +6,16 @@ const transactionSchema = new Schema({
         index: true,
         required: true,
     },
+    recipientUserName: {
+        type: String,
+        index: true,
+        required: true,
+    },
+    userName: {
+        type: String,
+        index: true,
+        required: true,
+    },
     recipientId: {
         type: Schema.Types.ObjectId,
         default: null,

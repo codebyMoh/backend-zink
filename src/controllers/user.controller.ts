@@ -10,29 +10,36 @@ export async function register(
   res: Response,
   next: NextFunction,
 ) {
-  const { email, addressEvm, addressSolana,smartWalletAddress, userId, orgId } = req.body;
+  const {
+    email,
+    addressEvm,
+    addressSolana,
+    smartWalletAddress,
+    userId,
+    orgId,
+  } = req.body;
   // check user is exist or not.
   const isUserExist = await User.findOne({ email: email });
   if (isUserExist) {
     const token = await isUserExist?.generateJWTToken('30d');
-  if (!token) {
-    return ThrowError(
-      code.INTERNAL_SERVER_ERROR,
-      'Internal server error (Token generation).',
-    );
-  }
-  return apiResponse(res, code.SUCCESS, 'User login successfull.', {
-    user: {
-      _id: isUserExist?._id,
-      email: isUserExist?.email,
-      userName: isUserExist?.userName,
-      addressSolana: isUserExist?.walletAddressSolana,
-      addressEVM: isUserExist?.walletAddressEVM,
-      smartWalletAddress: isUserExist?.smartWalletAddress,
-      active: isUserExist?.active,
-    },
-    token,
-  });
+    if (!token) {
+      return ThrowError(
+        code.INTERNAL_SERVER_ERROR,
+        'Internal server error (Token generation).',
+      );
+    }
+    return apiResponse(res, code.SUCCESS, 'User login successfull.', {
+      user: {
+        _id: isUserExist?._id,
+        email: isUserExist?.email,
+        userName: isUserExist?.userName,
+        addressSolana: isUserExist?.walletAddressSolana,
+        addressEVM: isUserExist?.walletAddressEVM,
+        smartWalletAddress: isUserExist?.smartWalletAddress,
+        active: isUserExist?.active,
+      },
+      token,
+    });
   }
   // generate referralId
   const referralId = `${addressEvm?.slice(0, 6) + addressSolana?.slice(-6)}`;
@@ -74,7 +81,7 @@ export async function register(
       'Internal server error (Token generation).',
     );
   }
-  return apiResponse(res, code.SUCCESS, 'User login successfully.', {
+  return apiResponse(res, code.SUCCESS, 'User register successfully.', {
     user: {
       _id: user?._id,
       email: user?.email,
@@ -172,6 +179,9 @@ export async function scanUserBasedOnID(
   );
   if (!findUser) {
     return ThrowError(code.UNAUTHORIZED, 'User not found.');
+  }
+  if (findUser?._id?.toString() == id) {
+    return ThrowError(code.NOT_ALLOWED, 'This is your own qr code.');
   }
   return apiResponse(res, code.SUCCESS, 'User found.', {
     user: findUser,

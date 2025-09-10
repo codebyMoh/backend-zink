@@ -21,7 +21,7 @@ export async function storeTransaction(
   const { recipientId, amount, tx, currency } = req.body;
   //   find recipient
   const recipientUser = await User.findById(recipientId).select(
-    '_id walletAddressEVM',
+    '_id walletAddressEVM userName',
   );
   if (!recipientUser) {
     return ThrowError(code.BAD_REQUEST, 'Invalid recipient.');
@@ -30,6 +30,8 @@ export async function storeTransaction(
   const transaction = await Transaction.create({
     userId: user?._id,
     recipientId: recipientUser?._id,
+    recipientUserName: recipientUser?.userName,
+    userName: user?.userName,
     amount: Number(amount),
     tx: tx,
     recipientAddress: recipientUser?.walletAddressEVM,

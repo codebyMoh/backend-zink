@@ -32,6 +32,8 @@ export interface IUser extends Document {
 export interface ITransaction extends Document {
   userId: mongoose.Types.ObjectId | null;
   recipientId: mongoose.Types.ObjectId | null;
+  recipientUserName: string;
+  userName: string;
   tx: string;
   amount: number;
   recipientAddress: string;
