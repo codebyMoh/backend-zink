@@ -5,7 +5,6 @@ import { apiResponse } from '../utils/apiResponse.js';
 // register
 export async function register(req, res, next) {
     const { email, addressEvm, addressSolana, smartWalletAddress, userId, orgId } = req.body;
-    console.log(email, addressEvm, addressSolana, userId, orgId, "--------------------------");
     // check user is exist or not.
     const isUserExist = await User.findOne({ email: email });
     if (isUserExist) {
@@ -126,7 +125,6 @@ export async function findUserBasedOnUsername(req, res, next) {
 //scan user based on id
 export async function scanUserBasedOnID(req, res, next) {
     const { id } = req.validatedParams;
-    console.log(id, "------------------");
     const findUser = await User.findById(id).select('name email userName walletAddressEVM userIdAlchemy smartWalletAddress');
     if (!findUser) {
         return ThrowError(code.UNAUTHORIZED, 'User not found.');

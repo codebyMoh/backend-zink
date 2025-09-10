@@ -11,7 +11,6 @@ export async function register(
   next: NextFunction,
 ) {
   const { email, addressEvm, addressSolana,smartWalletAddress, userId, orgId } = req.body;
-  console.log(email, addressEvm, addressSolana, userId, orgId, "--------------------------");
   // check user is exist or not.
   const isUserExist = await User.findOne({ email: email });
   if (isUserExist) {
@@ -168,7 +167,6 @@ export async function scanUserBasedOnID(
   next: NextFunction,
 ) {
   const { id } = req.validatedParams;
-  console.log(id, "------------------");
   const findUser = await User.findById(id).select(
     'name email userName walletAddressEVM userIdAlchemy smartWalletAddress',
   );
