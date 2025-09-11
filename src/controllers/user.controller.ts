@@ -95,6 +95,43 @@ export async function register(
   });
 }
 
+// add suer fullname
+export async function addUserFullName(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.UNAUTHORIZED,
+      'Unauthorized request(user not found from token.)',
+    );
+  }
+  if (user?.fullName) {
+    return ThrowError(code.BAD_REQUEST, 'User name already added.');
+  }
+  const { fullName } = req.body;
+  const updateUser = await User.findByIdAndUpdate(
+    user?._id,
+    {
+      $set: { fullName },
+    },
+    { new: true, runValidators: true },
+  ).select(
+    '_id email userName fullName walletAddressEVM smartWalletAddress active',
+  );
+  if (!updateUser?._id) {
+    return ThrowError(
+      code.INTERNAL_SERVER_ERROR,
+      'Internal server error(add username.)',
+    );
+  }
+  return apiResponse(res, code.SUCCESS, 'Fullname added successfully.', {
+    user: updateUser,
+  });
+}
+
 // add referral
 export async function addReferral(
   req: Request,

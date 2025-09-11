@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   addReferral,
+  addUserFullName,
   findUserBasedOnUsername,
   register,
   scanUserBasedOnID,
@@ -10,6 +11,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
   addReferralSchema,
+  addUserNameSchema,
   findUserUsingUsernameSchema,
   registerSchema,
   scanUserUsingIdSchema,
@@ -24,6 +26,12 @@ router.post(
   '/register',
   asyncHandler(validateBody(registerSchema)),
   asyncHandler(register),
+);
+router.put(
+  '/addFullName',
+  asyncHandler(authUser),
+  asyncHandler(validateBody(addUserNameSchema)),
+  asyncHandler(addUserFullName),
 );
 
 // add referral

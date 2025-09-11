@@ -1,4 +1,5 @@
 import zod from 'zod';
+// register schema
 export const registerSchema = zod.object({
     email: zod
         .string()
@@ -26,15 +27,23 @@ export const registerSchema = zod.object({
     orgId: zod.string().min(1, 'alchemy orgid is required.'),
     // fullName: zod.string().min(3, 'fullname is required.'),
 });
+// add referral
 export const addReferralSchema = zod.object({
     inviteCode: zod.string().min(1, 'Invitecode is required.'),
 });
+// find user by username
 export const findUserUsingUsernameSchema = zod.object({
     userName: zod.string().min(8, 'Invalid username.'),
 });
+// search user by username
 export const searchUserUsingUsernameSchema = zod.object({
     search: zod.string().min(3, 'Invalid username.'),
 });
+// scan user using ID
 export const scanUserUsingIdSchema = zod.object({
     id: zod.string().min(8, 'Invalid user.'),
+});
+// set full name
+export const addUserNameSchema = zod.object({
+    fullName: zod.string().min(3, 'Invalid name.'),
 });

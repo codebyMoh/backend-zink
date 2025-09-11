@@ -5,7 +5,6 @@ export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   fullName?: string;
   email: string;
-  name: string;
   userName: string;
   walletAddressEVM?: string;
   walletAddressSolana?: string;
