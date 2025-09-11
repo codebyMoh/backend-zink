@@ -102,3 +102,39 @@ export async function getreceiveTransaction(
     transactions,
   });
 }
+
+// search transaction by username
+export async function searchTransactionByUsername(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'Unauthorized request(user not found from token).',
+    );
+  }
+  const { search } = req.validatedParams;
+  const regex = new RegExp(`^${search}`, 'i');
+  const transactions = await Transaction.find({
+    $and: [
+      {
+        $or: [{ userId: user?._id }, { recipientId: user?._id }],
+      },
+      {
+        $or: [
+          { userName: { $regex: regex } },
+          { recipientUserName: { $regex: regex } },
+        ],
+      },
+    ],
+  });
+  if (transactions?.length == 0) {
+    return ThrowError(code.NOT_FOUND, 'No transactions found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'Transaction found.', {
+    transactions,
+  });
+}

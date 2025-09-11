@@ -24,12 +24,16 @@ export const registerSchema = zod.object({
     }),
     userId: zod.string().min(1, 'alchemy userid is required.'),
     orgId: zod.string().min(1, 'alchemy orgid is required.'),
+    // fullName: zod.string().min(3, 'fullname is required.'),
 });
 export const addReferralSchema = zod.object({
     inviteCode: zod.string().min(1, 'Invitecode is required.'),
 });
 export const findUserUsingUsernameSchema = zod.object({
     userName: zod.string().min(8, 'Invalid username.'),
+});
+export const searchUserUsingUsernameSchema = zod.object({
+    search: zod.string().min(8, 'Invalid username.'),
 });
 export const scanUserUsingIdSchema = zod.object({
     id: zod.string().min(8, 'Invalid user.'),

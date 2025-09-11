@@ -16,7 +16,7 @@ export const registerSchema = zod.object({
     .refine((val) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(val), {
       message: 'Invalid Solana address',
     }),
-    smartWalletAddress: zod
+  smartWalletAddress: zod
     .string()
     .min(1, 'Smart wallet address is required.')
     .refine((val) => /^0x[a-fA-F0-9]{40}$/.test(val), {
@@ -24,6 +24,7 @@ export const registerSchema = zod.object({
     }),
   userId: zod.string().min(1, 'alchemy userid is required.'),
   orgId: zod.string().min(1, 'alchemy orgid is required.'),
+  // fullName: zod.string().min(3, 'fullname is required.'),
 });
 
 export const addReferralSchema = zod.object({
@@ -31,6 +32,9 @@ export const addReferralSchema = zod.object({
 });
 export const findUserUsingUsernameSchema = zod.object({
   userName: zod.string().min(8, 'Invalid username.'),
+});
+export const searchUserUsingUsernameSchema = zod.object({
+  search: zod.string().min(3, 'Invalid username.'),
 });
 export const scanUserUsingIdSchema = zod.object({
   id: zod.string().min(8, 'Invalid user.'),

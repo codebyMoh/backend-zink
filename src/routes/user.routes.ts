@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { addReferral, findUserBasedOnUsername, register, scanUserBasedOnID } from '../controllers/user.controller.js';
+import {
+  addReferral,
+  findUserBasedOnUsername,
+  register,
+  scanUserBasedOnID,
+  searchUserByUserName,
+} from '../controllers/user.controller.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
@@ -7,6 +13,7 @@ import {
   findUserUsingUsernameSchema,
   registerSchema,
   scanUserUsingIdSchema,
+  searchUserUsingUsernameSchema,
 } from '../payloadValidation/user.validation.js';
 import { authUser } from '../middlewares/userAuth.js';
 
@@ -38,7 +45,15 @@ router.get(
   '/findUser/:userName',
   asyncHandler(authUser),
   asyncHandler(validateParams(findUserUsingUsernameSchema)),
-  asyncHandler(findUserBasedOnUsername  ),
+  asyncHandler(findUserBasedOnUsername),
+);
+
+// search user based on the username
+router.get(
+  '/searchUserByUserName/:search',
+  asyncHandler(authUser),
+  asyncHandler(validateParams(searchUserUsingUsernameSchema)),
+  asyncHandler(searchUserByUserName),
 );
 
 export default router;

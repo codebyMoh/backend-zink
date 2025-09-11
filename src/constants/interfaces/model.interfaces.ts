@@ -3,6 +3,7 @@ import type mongoose from 'mongoose';
 // 1️⃣ Define the interface for User document (all fields + methods)
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
+  fullName?: string;
   email: string;
   name: string;
   userName: string;

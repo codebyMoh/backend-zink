@@ -8,7 +8,6 @@ import type { IUser } from '../constants/interfaces/model.interfaces.js';
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true, index: true },
-    name: { type: String, default: null },
     userName: { type: String, required: true, unique: true, index: true },
     walletAddressEVM: { type: String, unique: true },
     walletAddressSolana: { type: String, unique: true },

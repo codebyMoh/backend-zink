@@ -81,7 +81,7 @@ export async function register(
       'Internal server error (Token generation).',
     );
   }
-  return apiResponse(res, code.SUCCESS, 'User register successfully.', {
+  return apiResponse(res, code.SUCCESS, 'User login successfully.', {
     user: {
       _id: user?._id,
       email: user?.email,
@@ -164,6 +164,32 @@ export async function findUserBasedOnUsername(
   }
   return apiResponse(res, code.SUCCESS, 'User found.', {
     user: findUser,
+  });
+}
+
+// search user using username
+export async function searchUserByUserName(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'Unauthorized request(user not found from token).',
+    );
+  }
+  const { search } = req.validatedParams;
+  const regex = new RegExp(`^${search}`, 'i');
+  const users = await User.find({ userName: { $regex: regex } }).select(
+    '_id email userName walletAddressEVM smartWalletAddress active',
+  );
+  if (users?.length == 0) {
+    return ThrowError(code.NOT_FOUND, 'No user found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'Users found.', {
+    users,
   });
 }
 
