@@ -33,7 +33,7 @@ export const findUserUsingUsernameSchema = zod.object({
     userName: zod.string().min(8, 'Invalid username.'),
 });
 export const searchUserUsingUsernameSchema = zod.object({
-    search: zod.string().min(8, 'Invalid username.'),
+    search: zod.string().min(3, 'Invalid username.'),
 });
 export const scanUserUsingIdSchema = zod.object({
     id: zod.string().min(8, 'Invalid user.'),

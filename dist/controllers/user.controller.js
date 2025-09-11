@@ -130,7 +130,7 @@ export async function searchUserByUserName(req, res, next) {
     }
     const { search } = req.validatedParams;
     const regex = new RegExp(`^${search}`, 'i');
-    const users = await User.find({ userName: { $regex: regex } });
+    const users = await User.find({ userName: { $regex: regex } }).select('_id email userName walletAddressEVM smartWalletAddress active');
     if (users?.length == 0) {
         return ThrowError(code.NOT_FOUND, 'No user found.');
     }

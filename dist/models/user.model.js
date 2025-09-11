@@ -4,9 +4,7 @@ import config from '../config/env/index.js';
 // 2️⃣ Schema definition
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true, index: true },
-    name: { type: String, default: null },
-    // userName: { type: String, required: true, unique: true, index: true },
-    fullName: { type: String, index: true },
+    userName: { type: String, required: true, unique: true, index: true },
     walletAddressEVM: { type: String, unique: true },
     walletAddressSolana: { type: String, unique: true },
     smartWalletAddress: { type: String, unique: true },

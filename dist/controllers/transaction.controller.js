@@ -82,9 +82,16 @@ export async function searchTransactionByUsername(req, res, next) {
     const { search } = req.validatedParams;
     const regex = new RegExp(`^${search}`, 'i');
     const transactions = await Transaction.find({
-        $or: [
-            { userName: { $regex: regex } },
-            { recipientUserName: { $regex: regex } },
+        $and: [
+            {
+                $or: [{ userId: user?._id }, { recipientId: user?._id }],
+            },
+            {
+                $or: [
+                    { userName: { $regex: regex } },
+                    { recipientUserName: { $regex: regex } },
+                ],
+            },
         ],
     });
     if (transactions?.length == 0) {
