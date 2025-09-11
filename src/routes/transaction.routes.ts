@@ -4,11 +4,13 @@ import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
   getreceiveTransaction,
   getSendTransaction,
+  getTxForParticulerUser,
   searchTransactionByUsername,
   storeTransaction,
 } from '../controllers/transaction.controller.js';
 import {
   getSendTransactionSchema,
+  getTransactionForParticulerUser,
   searchTransactionByUserNameSchema,
   storeTransactionSchema,
 } from '../payloadValidation/transaction.validation.js';
@@ -42,5 +44,13 @@ router.get(
   asyncHandler(authUser),
   asyncHandler(validateParams(searchTransactionByUserNameSchema)),
   asyncHandler(searchTransactionByUsername),
+);
+
+// get transaction history for particuler user
+router.get(
+  '/getTransactionsForTwoUser/:page/:limit/:id',
+  asyncHandler(authUser),
+  asyncHandler(validateParams(getTransactionForParticulerUser)),
+  asyncHandler(getTxForParticulerUser),
 );
 export default router;

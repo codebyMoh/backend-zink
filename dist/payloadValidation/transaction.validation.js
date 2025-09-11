@@ -11,6 +11,13 @@ export const getSendTransactionSchema = zod.object({
     page: zod.string().min(1, 'Page is required.'),
     limit: zod.string().min(1, 'Limit is required.'),
 });
+// search tx by usser name
 export const searchTransactionByUserNameSchema = zod.object({
     search: zod.string().min(3, 'Invalid username.'),
+});
+// get transaction for particuler user
+export const getTransactionForParticulerUser = zod.object({
+    page: zod.string().min(1, 'Page is required.'),
+    limit: zod.string().min(1, 'Limit is required.'),
+    id: zod.string().min(1, 'userId is required.'),
 });

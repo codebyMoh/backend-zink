@@ -103,6 +103,39 @@ export async function getreceiveTransaction(
   });
 }
 
+// get tx for particuler user
+export async function getTxForParticulerUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  console.log("🚀 ~ getTxForParticulerUser ~ user:", user)
+  if (!user?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'Unauthorized request(user not found from token.)',
+    );
+  }
+  const { page, limit, id } = req.validatedParams;
+  const skip = (page - 1) * limit;
+  const transactions = await Transaction.find({
+    $or: [
+      { userId: user._id, recipientId: id },
+      { userId: id, recipientId: user._id },
+    ],
+  })
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limit);
+  if (transactions?.length == 0) {
+    return ThrowError(code.NOT_FOUND, 'Transaction not found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'Transaction fetched.', {
+    transactions,
+  });
+}
+
 // search transaction by username
 export async function searchTransactionByUsername(
   req: Request,
