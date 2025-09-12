@@ -123,10 +123,10 @@ export async function editPayemtnId(req, res, next) {
     // update paymentId
     const updatePaymentId = await User.findByIdAndUpdate(user?._id, {
         $set: {
-            paymentId: paymentId,
+            paymentId: `${paymentId}.zink`,
             isPaymentIdEdited: true,
         },
-    });
+    }, { new: true });
     if (!updatePaymentId?._id) {
         return ThrowError(code.INTERNAL_SERVER_ERROR, 'Internal server error(update paymentId).');
     }
