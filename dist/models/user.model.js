@@ -4,8 +4,8 @@ import config from '../config/env/index.js';
 // 2️⃣ Schema definition
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true, index: true },
-    userName: { type: String, required: true, unique: true, index: true },
-    fullName: { type: String, index: true, default: null },
+    paymentId: { type: String, required: true, unique: true, index: true },
+    userName: { type: String, index: true, default: null },
     walletAddressEVM: { type: String, unique: true },
     walletAddressSolana: { type: String, unique: true },
     smartWalletAddress: { type: String, unique: true },
@@ -25,6 +25,7 @@ const userSchema = new Schema({
     referralAddedAt: { type: Date },
     active: { type: Boolean, default: false },
     lastLogin: { type: Date },
+    isPaymentIdEdited: { type: Boolean, default: false },
 }, { timestamps: true });
 // // 3️⃣ Middleware - hash password
 // userSchema.pre('save', async function (next) {

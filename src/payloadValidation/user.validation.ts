@@ -30,21 +30,42 @@ export const registerSchema = zod.object({
 
 // add referral
 export const addReferralSchema = zod.object({
-  inviteCode: zod.string().min(1, 'Invitecode is required.'),
+  inviteCode: zod
+    .string()
+    .min(10, 'Min 10 characters required..')
+    .max(15, 'You can only add max 15 characters.'),
 });
 // find user by username
 export const findUserUsingUsernameSchema = zod.object({
-  userName: zod.string().min(8, 'Invalid username.'),
+  userName: zod
+    .string()
+    .min(8, 'Min 8 characters required.')
+    .max(30, 'You can only add max 30 characters.'),
 });
 // search user by username
 export const searchUserUsingUsernameSchema = zod.object({
-  search: zod.string().min(3, 'Invalid username.'),
+  search: zod
+    .string()
+    .min(3, 'Min 3 characters required.')
+    .max(30, 'You can only add max 30 characters.'),
 });
 // scan user using ID
 export const scanUserUsingIdSchema = zod.object({
-  id: zod.string().min(8, 'Invalid user.'),
+  id: zod
+    .string()
+    .min(20, 'Min 8 characters required.')
+    .max(50, 'You can only add max 50 characters.'),
 });
 // set full name
 export const addUserNameSchema = zod.object({
-  fullName: zod.string().min(3, 'Invalid name.'),
+  fullName: zod
+    .string()
+    .min(3, 'Min 3 characters required.')
+    .max(15, 'You can only add max 15 characters.'),
+});
+export const editPaymentidSchema = zod.object({
+  paymentId: zod
+    .string()
+    .min(6, 'Min 6 characters required.')
+    .max(20, 'You can only add max 12 characters.'),
 });

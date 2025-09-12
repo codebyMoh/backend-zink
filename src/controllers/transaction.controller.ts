@@ -18,10 +18,10 @@ export async function storeTransaction(
       'Unauthorized request(user not found from token.)',
     );
   }
-  const { recipientId, amount, tx, currency } = req.body;
+  const { recipientId, amount, tx, currency, message } = req.body;
   //   find recipient
   const recipientUser = await User.findById(recipientId).select(
-    '_id walletAddressEVM userName',
+    '_id walletAddressEVM paymentId userName',
   );
   if (!recipientUser) {
     return ThrowError(code.BAD_REQUEST, 'Invalid recipient.');
@@ -30,12 +30,15 @@ export async function storeTransaction(
   const transaction = await Transaction.create({
     userId: user?._id,
     recipientId: recipientUser?._id,
-    recipientUserName: recipientUser?.userName,
+    userPaymentId: user?.paymentId,
     userName: user?.userName,
+    recipientPaymentId: recipientUser?.paymentId,
+    recipientUserName: recipientUser?.userName,
     amount: Number(amount),
     tx: tx,
     recipientAddress: recipientUser?.walletAddressEVM,
     currency: currency,
+    message: message ? message : 'Money sent.',
   });
   if (!transaction) {
     return ThrowError(
@@ -48,6 +51,28 @@ export async function storeTransaction(
   });
 }
 
+// get single transaction by _id
+export async function getSingleTransaction(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'Unauthorized request(user not found from token.)',
+    );
+  }
+  const { id } = req.validatedParams;
+  const findTransaction = await Transaction.findById(id);
+  if (findTransaction?._id) {
+    return ThrowError(code.NOT_FOUND, 'Transaction not found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'Transaction fetched.', {
+    transaction: findTransaction,
+  });
+}
 // get send transaction
 export async function getSendTransaction(
   req: Request,
@@ -110,7 +135,6 @@ export async function getTxForParticulerUser(
   next: NextFunction,
 ) {
   const user = req.user;
-  console.log("🚀 ~ getTxForParticulerUser ~ user:", user)
   if (!user?._id) {
     return ThrowError(
       code.BAD_REQUEST,
@@ -158,6 +182,8 @@ export async function searchTransactionByUsername(
       },
       {
         $or: [
+          { userPaymentId: { $regex: regex } },
+          { recipientPaymentId: { $regex: regex } },
           { userName: { $regex: regex } },
           { recipientUserName: { $regex: regex } },
         ],
@@ -166,6 +192,55 @@ export async function searchTransactionByUsername(
   });
   if (transactions?.length == 0) {
     return ThrowError(code.NOT_FOUND, 'No transactions found.');
+  }
+  return apiResponse(res, code.SUCCESS, 'Transaction found.', {
+    transactions,
+  });
+}
+
+// get recent transaction
+export async function getRecentTransaction(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'Unauthorized request(user not found from token).',
+    );
+  }
+  const transactions = await Transaction.aggregate([
+    {
+      $match: {
+        $or: [{ recipientId: user._id }, { userId: user._id }],
+      },
+    },
+    {
+      $sort: { _id: -1 },
+    },
+    {
+      $group: {
+        _id: {
+          $cond: {
+            if: { $eq: ['$userId', user._id] },
+            then: '$recipientId',
+            else: '$userId',
+          },
+        },
+        latestTransaction: { $first: '$$ROOT' },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$latestTransaction' },
+    },
+    {
+      $limit: 30,
+    },
+  ]);
+  if (transactions?.length == 0) {
+    return ThrowError(code.NOT_FOUND, 'No transaction found.');
   }
   return apiResponse(res, code.SUCCESS, 'Transaction found.', {
     transactions,

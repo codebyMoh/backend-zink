@@ -6,7 +6,7 @@ const transactionSchema = new Schema({
         index: true,
         required: true,
     },
-    recipientUserName: {
+    userPaymentId: {
         type: String,
         index: true,
         required: true,
@@ -16,9 +16,18 @@ const transactionSchema = new Schema({
         index: true,
         required: true,
     },
+    recipientPaymentId: {
+        type: String,
+        index: true,
+        required: true,
+    },
+    recipientUserName: {
+        type: String,
+        index: true,
+        required: true,
+    },
     recipientId: {
         type: Schema.Types.ObjectId,
-        default: null,
         index: true,
         required: true,
     },
@@ -27,6 +36,7 @@ const transactionSchema = new Schema({
         required: true,
     },
     tx: { type: String, required: true },
+    message: { type: String, default: null },
     recipientAddress: {
         type: String,
         required: true,

@@ -3,7 +3,7 @@ import type mongoose from 'mongoose';
 // 1️⃣ Define the interface for User document (all fields + methods)
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
-  fullName?: string;
+  paymentId: string;
   email: string;
   userName: string;
   walletAddressEVM?: string;
@@ -25,6 +25,7 @@ export interface IUser extends Document {
   referralAddedAt?: Date;
   lastLogin?: Date;
   active: Boolean;
+  isPaymentIdEdited: Boolean;
   // methods
   generateJWTToken(expiresIn: string | number): string;
 }
@@ -32,9 +33,12 @@ export interface IUser extends Document {
 export interface ITransaction extends Document {
   userId: mongoose.Types.ObjectId | null;
   recipientId: mongoose.Types.ObjectId | null;
+  recipientPaymentId: string;
   recipientUserName: string;
   userName: string;
+  userPaymentId: string;
   tx: string;
+  message?: string;
   amount: number;
   recipientAddress: string;
   currency: string;

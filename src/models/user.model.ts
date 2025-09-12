@@ -8,8 +8,8 @@ import type { IUser } from '../constants/interfaces/model.interfaces.js';
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true, index: true },
-    userName: { type: String, required: true, unique: true, index: true },
-    fullName: { type: String, index: true, default: null },
+    paymentId: { type: String, required: true, unique: true, index: true },
+    userName: { type: String, index: true, default: null },
     walletAddressEVM: { type: String, unique: true },
     walletAddressSolana: { type: String, unique: true },
     smartWalletAddress: { type: String, unique: true },
@@ -29,6 +29,7 @@ const userSchema = new Schema<IUser>(
     referralAddedAt: { type: Date },
     active: { type: Boolean, default: false },
     lastLogin: { type: Date },
+    isPaymentIdEdited: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

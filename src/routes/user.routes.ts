@@ -2,7 +2,8 @@ import { Router } from 'express';
 import {
   addReferral,
   addUserFullName,
-  findUserBasedOnUsername,
+  editPayemtnId,
+  findUserByPaymentId,
   register,
   scanUserBasedOnID,
   searchUserByUserName,
@@ -12,6 +13,7 @@ import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
   addReferralSchema,
   addUserNameSchema,
+  editPaymentidSchema,
   findUserUsingUsernameSchema,
   registerSchema,
   scanUserUsingIdSchema,
@@ -27,11 +29,22 @@ router.post(
   asyncHandler(validateBody(registerSchema)),
   asyncHandler(register),
 );
+
+// add full name
 router.put(
   '/addFullName',
   asyncHandler(authUser),
   asyncHandler(validateBody(addUserNameSchema)),
   asyncHandler(addUserFullName),
+);
+
+// edit paymentId for once
+
+router.put(
+  '/editPaymentId',
+  asyncHandler(authUser),
+  asyncHandler(validateBody(editPaymentidSchema)),
+  asyncHandler(editPayemtnId),
 );
 
 // add referral
@@ -48,12 +61,12 @@ router.get(
   asyncHandler(validateParams(scanUserUsingIdSchema)),
   asyncHandler(scanUserBasedOnID),
 );
-// find user based on userName
+// find user based on paymentId
 router.get(
-  '/findUser/:userName',
+  '/findUser/:paymentId',
   asyncHandler(authUser),
   asyncHandler(validateParams(findUserUsingUsernameSchema)),
-  asyncHandler(findUserBasedOnUsername),
+  asyncHandler(findUserByPaymentId),
 );
 
 // search user based on the username

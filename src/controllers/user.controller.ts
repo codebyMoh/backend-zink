@@ -21,25 +21,38 @@ export async function register(
   // check user is exist or not.
   const isUserExist = await User.findOne({ email: email });
   if (isUserExist) {
-    const token = await isUserExist?.generateJWTToken('30d');
-    if (!token) {
+    if (
+      isUserExist?.walletAddressEVM == addressEvm &&
+      isUserExist?.walletAddressSolana == addressSolana &&
+      isUserExist?.smartWalletAddress == smartWalletAddress &&
+      isUserExist?.userIdAlchemy == userId &&
+      isUserExist?.orgIdAlchemy == orgId
+    ) {
+      const token = await isUserExist?.generateJWTToken('30d');
+      if (!token) {
+        return ThrowError(
+          code.INTERNAL_SERVER_ERROR,
+          'Internal server error (Token generation).',
+        );
+      }
+      return apiResponse(res, code.SUCCESS, 'User login successfull.', {
+        user: {
+          _id: isUserExist?._id,
+          email: isUserExist?.email,
+          userName: isUserExist?.userName,
+          addressSolana: isUserExist?.walletAddressSolana,
+          addressEVM: isUserExist?.walletAddressEVM,
+          smartWalletAddress: isUserExist?.smartWalletAddress,
+          active: isUserExist?.active,
+        },
+        token,
+      });
+    } else {
       return ThrowError(
-        code.INTERNAL_SERVER_ERROR,
-        'Internal server error (Token generation).',
+        code.UNAUTHORIZED,
+        'Unauthorized request(User data mismatch).',
       );
     }
-    return apiResponse(res, code.SUCCESS, 'User login successfull.', {
-      user: {
-        _id: isUserExist?._id,
-        email: isUserExist?.email,
-        userName: isUserExist?.userName,
-        addressSolana: isUserExist?.walletAddressSolana,
-        addressEVM: isUserExist?.walletAddressEVM,
-        smartWalletAddress: isUserExist?.smartWalletAddress,
-        active: isUserExist?.active,
-      },
-      token,
-    });
   }
   // generate referralId
   const referralId = `${addressEvm?.slice(0, 6) + addressSolana?.slice(-6)}`;
@@ -51,9 +64,9 @@ export async function register(
   if (!emailFirst) {
     return ThrowError(code.BAD_REQUEST, 'Email first half.');
   }
-  const userName = `${emailFirst}${referralId}.zink`;
-  if (!userName) {
-    return ThrowError(code.BAD_REQUEST, 'Username.');
+  const paymentId = `${emailFirst}.zink`;
+  if (!paymentId) {
+    return ThrowError(code.INTERNAL_SERVER_ERROR, 'paymentId not created.');
   }
   // store user in DB
   const user = await User.create({
@@ -64,7 +77,7 @@ export async function register(
     userIdAlchemy: userId,
     orgIdAlchemy: orgId,
     referralId: referralId,
-    userName: userName,
+    paymentId: paymentId,
     lastLogin: new Date(),
     active: true,
   });
@@ -81,11 +94,12 @@ export async function register(
       'Internal server error (Token generation).',
     );
   }
-  return apiResponse(res, code.SUCCESS, 'User login successfully.', {
+  return apiResponse(res, code.SUCCESS, 'User register successfully.', {
     user: {
       _id: user?._id,
       email: user?.email,
       userName: user?.userName,
+      paymentId: user?.paymentId,
       addressSolana: user?.walletAddressSolana,
       addressEVM: user?.walletAddressEVM,
       smartWalletAddress: user?.smartWalletAddress,
@@ -108,18 +122,18 @@ export async function addUserFullName(
       'Unauthorized request(user not found from token.)',
     );
   }
-  if (user?.fullName) {
+  if (user?.userName) {
     return ThrowError(code.BAD_REQUEST, 'User name already added.');
   }
   const { fullName } = req.body;
   const updateUser = await User.findByIdAndUpdate(
     user?._id,
     {
-      $set: { fullName },
+      $set: { userName: fullName },
     },
     { new: true, runValidators: true },
   ).select(
-    '_id email userName fullName walletAddressEVM smartWalletAddress active',
+    '_id email userName paymentId fullName walletAddressEVM smartWalletAddress active',
   );
   if (!updateUser?._id) {
     return ThrowError(
@@ -132,6 +146,51 @@ export async function addUserFullName(
   });
 }
 
+// edit payment id for once
+export async function editPayemtnId(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.UNAUTHORIZED,
+      'Unauthorized request(user not found from token.)',
+    );
+  }
+  if (user?.isPaymentIdEdited) {
+    return ThrowError(code.BAD_REQUEST, 'You can only edit paymentId once.');
+  }
+  const { paymentId } = req.body;
+  if (paymentId.toString().slice(-5) == '.zink') {
+    return ThrowError(code.BAD_REQUEST, 'You can not add zink.');
+  }
+  // check is payment id exist
+  const isPaymentId = await User.findOne({ paymentId: `${paymentId}.zink` });
+  if (isPaymentId?._id) {
+    return ThrowError(
+      code.BAD_REQUEST,
+      'This id is already exist please choose different.',
+    );
+  }
+  // update paymentId
+  const updatePaymentId = await User.findByIdAndUpdate(user?._id, {
+    $set: {
+      paymentId: paymentId,
+      isPaymentIdEdited: true,
+    },
+  });
+  if (!updatePaymentId?._id) {
+    return ThrowError(
+      code.INTERNAL_SERVER_ERROR,
+      'Internal server error(update paymentId).',
+    );
+  }
+  return apiResponse(res, code.SUCCESS, 'PaymentId updated successfully.', {
+    paymentId: updatePaymentId?.paymentId,
+  });
+}
 // add referral
 export async function addReferral(
   req: Request,
@@ -186,15 +245,15 @@ export async function addReferral(
   return apiResponse(res, code.SUCCESS, 'Referral added successfully.', {});
 }
 
-// find user based on username
-export async function findUserBasedOnUsername(
+// find user based on paymentId
+export async function findUserByPaymentId(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  const { userName } = req.validatedParams;
-  const findUser = await User.findOne({ userName }).select(
-    'name email userName walletAddressEVM userIdAlchemy',
+  const { paymentId } = req.validatedParams;
+  const findUser = await User.findOne({ paymentId }).select(
+    'name email userName paymentId walletAddressEVM userIdAlchemy',
   );
   if (!findUser) {
     return ThrowError(code.UNAUTHORIZED, 'User not found.');
@@ -219,8 +278,20 @@ export async function searchUserByUserName(
   }
   const { search } = req.validatedParams;
   const regex = new RegExp(`^${search}`, 'i');
-  const users = await User.find({ userName: { $regex: regex } }).select(
-    '_id email userName walletAddressEVM smartWalletAddress active',
+  const users = await User.find({
+    $and: [
+      {
+        _id: { $ne: user?._id },
+      },
+      {
+        $or: [
+          { userName: { $regex: regex } },
+          { paymentId: { $regex: regex } },
+        ],
+      },
+    ],
+  }).select(
+    '_id email userName paymentId walletAddressEVM smartWalletAddress active',
   );
   if (users?.length == 0) {
     return ThrowError(code.NOT_FOUND, 'No user found.');
@@ -238,7 +309,7 @@ export async function scanUserBasedOnID(
 ) {
   const { id } = req.validatedParams;
   const findUser = await User.findById(id).select(
-    'name email userName walletAddressEVM userIdAlchemy smartWalletAddress',
+    'name email userName paymentId walletAddressEVM userIdAlchemy smartWalletAddress',
   );
   if (!findUser) {
     return ThrowError(code.UNAUTHORIZED, 'User not found.');

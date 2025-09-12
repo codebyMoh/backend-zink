@@ -19,7 +19,6 @@ export async function authUser(
 ): Promise<void> {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log("🚀 ~ authUser ~ token:", token)
     if (!token) {
       return ThrowError(code.UNAUTHORIZED, 'Unauthorized request');
     }
