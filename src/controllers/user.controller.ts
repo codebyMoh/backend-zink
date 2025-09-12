@@ -175,12 +175,16 @@ export async function editPayemtnId(
     );
   }
   // update paymentId
-  const updatePaymentId = await User.findByIdAndUpdate(user?._id, {
-    $set: {
-      paymentId: paymentId,
-      isPaymentIdEdited: true,
+  const updatePaymentId = await User.findByIdAndUpdate(
+    user?._id,
+    {
+      $set: {
+        paymentId: `${paymentId}.zink`,
+        isPaymentIdEdited: true,
+      },
     },
-  });
+    { new: true },
+  );
   if (!updatePaymentId?._id) {
     return ThrowError(
       code.INTERNAL_SERVER_ERROR,
