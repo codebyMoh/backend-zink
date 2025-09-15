@@ -43,6 +43,8 @@ export async function register(
           addressSolana: isUserExist?.walletAddressSolana,
           addressEVM: isUserExist?.walletAddressEVM,
           smartWalletAddress: isUserExist?.smartWalletAddress,
+          paymentId: isUserExist?.paymentId,
+          isPaymentIdEdited: isUserExist?.isPaymentIdEdited,
           active: isUserExist?.active,
         },
         token,
@@ -100,6 +102,7 @@ export async function register(
       email: user?.email,
       userName: user?.userName,
       paymentId: user?.paymentId,
+      isPaymentIdEdited: user?.isPaymentIdEdited,
       addressSolana: user?.walletAddressSolana,
       addressEVM: user?.walletAddressEVM,
       smartWalletAddress: user?.smartWalletAddress,
@@ -126,6 +129,14 @@ export async function addUserFullName(
     return ThrowError(code.BAD_REQUEST, 'User name already added.');
   }
   const { fullName } = req.body;
+  // check is username is exist or not.
+  const isUserNameExist = await User.findOne({
+    userName: { $regex: `^${fullName}$`, $options: 'i' },
+  });
+
+  if (isUserNameExist?._id) {
+    return ThrowError(code.BAD_REQUEST, 'User name already exist.');
+  }
   const updateUser = await User.findByIdAndUpdate(
     user?._id,
     {

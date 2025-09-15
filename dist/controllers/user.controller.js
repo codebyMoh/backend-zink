@@ -92,6 +92,13 @@ export async function addUserFullName(req, res, next) {
         return ThrowError(code.BAD_REQUEST, 'User name already added.');
     }
     const { fullName } = req.body;
+    // check is username is exist or not.
+    const isUserNameExist = await User.findOne({
+        userName: { $regex: `^${fullName}$`, $options: 'i' },
+    });
+    if (isUserNameExist?._id) {
+        return ThrowError(code.BAD_REQUEST, 'User name already exist.');
+    }
     const updateUser = await User.findByIdAndUpdate(user?._id, {
         $set: { userName: fullName },
     }, { new: true, runValidators: true }).select('_id email userName paymentId fullName walletAddressEVM smartWalletAddress active');
