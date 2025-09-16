@@ -145,6 +145,12 @@ export async function getTxForParticulerUser(
   if (user?._id == id) {
     return ThrowError(code.BAD_REQUEST, 'You can not pass user own id.');
   }
+  const recipientuserDetails = await User.findById(id).select(
+    '_id email paymentId userName walletAddressEVM smartWalletAddress',
+  );
+  if (!recipientuserDetails?._id) {
+    return ThrowError(code.BAD_REQUEST, 'Recipient user not found.');
+  }
   const skip = (page - 1) * limit;
   const transactions = await Transaction.find({
     $or: [
@@ -165,6 +171,7 @@ export async function getTxForParticulerUser(
   );
   return apiResponse(res, code.SUCCESS, 'Transaction fetched.', {
     transactions: sortedTransaction,
+    recipientuser: recipientuserDetails,
   });
 }
 
