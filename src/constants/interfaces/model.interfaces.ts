@@ -31,6 +31,7 @@ export interface IUser extends Document {
 }
 
 export interface ITransaction extends Document {
+  _id: mongoose.Types.ObjectId; 
   userId: mongoose.Types.ObjectId | null;
   recipientId: mongoose.Types.ObjectId | null;
   recipientPaymentId: string;
@@ -42,4 +43,5 @@ export interface ITransaction extends Document {
   amount: number;
   recipientAddress: string;
   currency: string;
+  createdAt?: Date;
 }
