@@ -22,7 +22,7 @@ export const getSingleTransactionSchema = zod.object({
 export const searchTransactionByUserNameSchema = zod.object({
     search: zod
         .string()
-        .min(3, 'Min 3 characters required.')
+        .min(1, 'Min 1 characters required.')
         .max(30, 'You can only add max 30 characters.'),
 });
 // get transaction for particuler user
