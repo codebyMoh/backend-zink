@@ -322,6 +322,13 @@ export async function scanUserBasedOnID(
   res: Response,
   next: NextFunction,
 ) {
+  const user = req.user;
+  if (!user?._id) {
+    return ThrowError(
+      code.UNAUTHORIZED,
+      'Unauthorized request(user not found from token.)',
+    );
+  }
   const { id } = req.validatedParams;
   const findUser = await User.findById(id).select(
     'name email userName paymentId walletAddressEVM userIdAlchemy smartWalletAddress',
@@ -329,7 +336,7 @@ export async function scanUserBasedOnID(
   if (!findUser) {
     return ThrowError(code.UNAUTHORIZED, 'User not found.');
   }
-  if (findUser?._id?.toString() == id) {
+  if (findUser?._id?.toString() == user?._id?.toString()) {
     return ThrowError(code.NOT_ALLOWED, 'This is your own qr code.');
   }
   return apiResponse(res, code.SUCCESS, 'User found.', {
