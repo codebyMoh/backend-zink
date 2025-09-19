@@ -40,9 +40,17 @@ const transactionSchema = new Schema<ITransaction>(
     },
     tx: { type: String, required: true },
     message: { type: String, default: null },
+    type: {
+      type: String,
+      required: true,
+    },
+    requestFullFilled: { type: Boolean, default: false },
     recipientAddress: {
       type: String,
       required: true,
+    },
+    chatMessage: {
+      type: String,
     },
     currency: {
       type: String,

@@ -18,7 +18,44 @@ export async function storeTransaction(
       'Unauthorized request(user not found from token.)',
     );
   }
-  const { recipientId, amount, tx, currency, message } = req.body;
+  const {
+    recipientId,
+    amount,
+    tx,
+    currency,
+    message,
+    type,
+    chatMessage,
+    requestSuccessId,
+  } = req.body;
+
+  if (type == 'request_payment_success') {
+    if (!requestSuccessId?.toString().trim()) {
+      return ThrowError(code.BAD_REQUEST, 'requestSuccessId is required.');
+    }
+    const updateRequestPayment = await Transaction.findByIdAndUpdate(
+      requestSuccessId,
+      {
+        $set: {
+          tx: tx,
+          requestFullFilled: true,
+        },
+      },
+      {
+        new: true,
+      },
+    );
+    if (!updateRequestPayment) {
+      return ThrowError(
+        code.INTERNAL_SERVER_ERROR,
+        'Internal server error(Updating request payment).',
+      );
+    }
+    return apiResponse(res, code.SUCCESS, 'Transaction updated.', {
+      transaction: updateRequestPayment,
+    });
+  }
+
   //   find recipient
   const recipientUser = await User.findById(recipientId).select(
     '_id walletAddressEVM paymentId userName',
@@ -26,20 +63,59 @@ export async function storeTransaction(
   if (!recipientUser) {
     return ThrowError(code.BAD_REQUEST, 'Invalid recipient.');
   }
+  let transaction = null;
   // store transaction
-  const transaction = await Transaction.create({
-    userId: user?._id,
-    recipientId: recipientUser?._id,
-    userPaymentId: user?.paymentId,
-    userName: user?.userName,
-    recipientPaymentId: recipientUser?.paymentId,
-    recipientUserName: recipientUser?.userName,
-    amount: Number(amount),
-    tx: tx,
-    recipientAddress: recipientUser?.walletAddressEVM,
-    currency: currency,
-    message: message ? message : 'Money sent.',
-  });
+  if (type == 'tx') {
+    transaction = await Transaction.create({
+      userId: user?._id,
+      recipientId: recipientUser?._id,
+      userPaymentId: user?.paymentId,
+      userName: user?.userName,
+      recipientPaymentId: recipientUser?.paymentId,
+      recipientUserName: recipientUser?.userName,
+      amount: Number(amount),
+      tx: tx,
+      recipientAddress: recipientUser?.walletAddressEVM,
+      currency: currency,
+      message: message ? message : 'Money sent.',
+      type: type,
+    });
+  } else if (type == 'chat') {
+    if (!chatMessage?.toString().trim()) {
+      return ThrowError(code.BAD_REQUEST, 'Chat message is requied.');
+    }
+    transaction = await Transaction.create({
+      userId: user?._id,
+      recipientId: recipientUser?._id,
+      userPaymentId: user?.paymentId,
+      userName: user?.userName,
+      recipientPaymentId: recipientUser?.paymentId,
+      recipientUserName: recipientUser?.userName,
+      amount: Number(1),
+      tx: 'chat message',
+      recipientAddress: recipientUser?.walletAddressEVM,
+      currency: 'chat message',
+      message: 'chat message',
+      type: type,
+      chatMessage: chatMessage,
+    });
+  } else if (type == 'request_payment') {
+    transaction = await Transaction.create({
+      userId: user?._id,
+      recipientId: recipientUser?._id,
+      userPaymentId: user?.paymentId,
+      userName: user?.userName,
+      recipientPaymentId: recipientUser?.paymentId,
+      recipientUserName: recipientUser?.userName,
+      amount: Number(amount),
+      tx: 'request_payment',
+      recipientAddress: recipientUser?.walletAddressEVM,
+      currency: currency,
+      message: message ? message : 'Request for money.',
+      type: type,
+      requestFullFilled: false,
+    });
+  }
   if (!transaction) {
     return ThrowError(
       code.INTERNAL_SERVER_ERROR,
