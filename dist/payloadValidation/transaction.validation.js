@@ -5,6 +5,13 @@ export const storeTransactionSchema = zod.object({
     amount: zod.number().gt(0, 'Amount is required.'),
     tx: zod.string().min(1, 'Tx hash is required.'),
     currency: zod.string().min(1, 'Currency is required.'),
+    type: zod
+        .string()
+        .min(2, 'type is required.')
+        .max(20, 'Type should be more than 20.'),
+    message: zod.string().optional(),
+    chatMessage: zod.string().optional(),
+    requestSuccessId: zod.string().optional(),
 });
 // getSendTransaction schema
 export const getSendTransactionSchema = zod.object({
