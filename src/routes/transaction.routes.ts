@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { validateBody, validateParams } from '../middlewares/zod.js';
 import {
+  declineReqPayment,
   getreceiveTransaction,
   getRecentTransaction,
   getSendTransaction,
@@ -16,6 +17,7 @@ import {
   getSingleTransactionSchema,
   searchTransactionByUserNameSchema,
   storeTransactionSchema,
+  declineTxSchema,
 } from '../payloadValidation/transaction.validation.js';
 import { authUser } from '../middlewares/userAuth.js';
 const router = Router();
@@ -26,6 +28,13 @@ router.post(
   asyncHandler(authUser),
   asyncHandler(validateBody(storeTransactionSchema)),
   asyncHandler(storeTransaction),
+);
+// declined request_payment
+router.put(
+  '/declineReqPayment/:txId',
+  asyncHandler(authUser),
+  asyncHandler(validateParams(declineTxSchema)),
+  asyncHandler(declineReqPayment),
 );
 // get transaction by _id
 router.get(

@@ -42,6 +42,7 @@ const transactionSchema = new Schema({
         required: true,
     },
     requestFullFilled: { type: Boolean, default: false },
+    isDeclined: { type: Boolean, default: false },
     recipientAddress: {
         type: String,
         required: true,

@@ -47,4 +47,5 @@ export interface ITransaction extends Document {
   type: string;
   chatMessage?: string;
   requestFullFilled?: boolean;
+  isDeclined?: boolean;
 }

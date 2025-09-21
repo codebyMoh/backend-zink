@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { validateBody, validateParams } from '../middlewares/zod.js';
-import { getreceiveTransaction, getRecentTransaction, getSendTransaction, getSingleTransaction, getTxForParticulerUser, searchTransactionByUsername, storeTransaction, } from '../controllers/transaction.controller.js';
-import { getSendTransactionSchema, getTransactionForParticulerUser, getSingleTransactionSchema, searchTransactionByUserNameSchema, storeTransactionSchema, } from '../payloadValidation/transaction.validation.js';
+import { declineReqPayment, getreceiveTransaction, getRecentTransaction, getSendTransaction, getSingleTransaction, getTxForParticulerUser, searchTransactionByUsername, storeTransaction, } from '../controllers/transaction.controller.js';
+import { getSendTransactionSchema, getTransactionForParticulerUser, getSingleTransactionSchema, searchTransactionByUserNameSchema, storeTransactionSchema, declineTxSchema, } from '../payloadValidation/transaction.validation.js';
 import { authUser } from '../middlewares/userAuth.js';
 const router = Router();
 // store transactions
 router.post('/addTransaction', asyncHandler(authUser), asyncHandler(validateBody(storeTransactionSchema)), asyncHandler(storeTransaction));
+// declined request_payment
+router.put('/declineReqPayment/:txId', asyncHandler(authUser), asyncHandler(validateParams(declineTxSchema)), asyncHandler(declineReqPayment));
 // get transaction by _id
 router.get('/getSingleTransaction/:id', asyncHandler(authUser), asyncHandler(validateParams(getSingleTransactionSchema)), asyncHandler(getSingleTransaction));
 // get send transaction

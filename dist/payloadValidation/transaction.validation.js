@@ -13,6 +13,10 @@ export const storeTransactionSchema = zod.object({
     chatMessage: zod.string().optional(),
     requestSuccessId: zod.string().optional(),
 });
+// decline transaction
+export const declineTxSchema = zod.object({
+    txId: zod.string().min(10, 'Invalid transaction id.'),
+});
 // getSendTransaction schema
 export const getSendTransactionSchema = zod.object({
     page: zod.string().min(1, 'Page is required.'),

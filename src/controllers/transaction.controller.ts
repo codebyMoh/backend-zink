@@ -126,6 +126,30 @@ export async function storeTransaction(
     transaction,
   });
 }
+// decline request payment
+export async function declineReqPayment(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const { txId } = req.validatedParams;
+  const findTransaction = await Transaction.findByIdAndUpdate(
+    txId,
+    {
+      $set: {
+        isDeclined: true,
+      },
+    },
+    { new: true },
+  );
+  if (!findTransaction?._id) {
+    return ThrowError(
+      code.INTERNAL_SERVER_ERROR,
+      'Internal server error(Updating tx).',
+    );
+  }
+  return apiResponse(res, code.SUCCESS, 'Request decline.', {});
+}
 
 // get single transaction by _id
 export async function getSingleTransaction(
