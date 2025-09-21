@@ -189,7 +189,7 @@ export async function getSendTransaction(
   const { page, limit } = req.validatedParams;
   const skip = (page - 1) * limit;
   // get transaction data
-  const transactions = await Transaction.find({ userId: user?._id })
+  const transactions = await Transaction.find({ userId: user?._id, type: 'tx' })
     .sort({ _id: -1 })
     .skip(skip)
     .limit(limit);
@@ -216,7 +216,10 @@ export async function getreceiveTransaction(
   const { page, limit } = req.validatedParams;
   const skip = (page - 1) * limit;
   // get transaction data
-  const transactions = await Transaction.find({ recipientId: user?._id })
+  const transactions = await Transaction.find({
+    recipientId: user?._id,
+    type: 'tx',
+  })
     .sort({ _id: -1 })
     .skip(skip)
     .limit(limit);
@@ -292,6 +295,9 @@ export async function searchTransactionByUsername(
   const regex = new RegExp(`^${search}`, 'i');
   const transactions = await Transaction.find({
     $and: [
+      {
+        type: 'tx',
+      },
       {
         $or: [{ userId: user?._id }, { recipientId: user?._id }],
       },
